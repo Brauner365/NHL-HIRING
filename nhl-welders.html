@@ -1,0 +1,395 @@
+<title>NHL Welder Shortlist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one long workshop sheet — thesis, NHL spec strip, filterable blind profiles, proof, local market, shortlist builder. Dark-first, Syntech red. */
+:root{
+  --bg:#141112; --panel:#1c1819; --panel2:#231e1f; --line:#342d2e; --fg:#f4efee; --muted:#a59a99;
+  --red:#E8302A; --red-soft:rgba(232,48,42,.14);
+  --ok:#47b673; --part:#dba63c; --no:#857a79;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f6f3f2; --panel:#ffffff; --panel2:#f0ebea; --line:#e0d8d6; --fg:#161112; --muted:#6a605f;
+  --red:#d12a24; --red-soft:rgba(209,42,36,.09); --ok:#25844b; --part:#a87410; --no:#8b807f; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f6f3f2; --panel:#ffffff; --panel2:#f0ebea; --line:#e0d8d6; --fg:#161112; --muted:#6a605f;
+  --red:#d12a24; --red-soft:rgba(209,42,36,.09); --ok:#25844b; --part:#a87410; --no:#8b807f; color-scheme:light}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:28px 64px;display:flex;flex-direction:column;gap:64px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.02}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--mono)}
+a{color:var(--fg)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px}
+.mark{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.06em}
+.mark b{color:var(--red)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.35fr 1fr;gap:40px;align-items:end}
+.hero h1{font-size:clamp(46px,8vw,92px);font-weight:800;text-transform:uppercase;letter-spacing:-.005em}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero .lede{margin-top:20px;max-width:58ch;color:var(--muted);font-size:18px}
+.hero .lede strong{color:var(--fg);font-weight:600}
+.bead{height:14px;margin-top:26px;background:
+  radial-gradient(circle at 7px 7px,var(--red) 5px,transparent 6px) 0 0/12px 14px repeat-x;opacity:.85;max-width:420px}
+.terms{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);background:var(--panel)}
+.terms div{display:flex;justify-content:space-between;gap:16px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.terms div:last-child{border-bottom:0}
+.terms span{color:var(--muted);font-size:14px}
+.terms strong{font-family:var(--display);font-size:22px;font-weight:700;text-align:right}
+
+/* NHL spec strip */
+.spec{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--fg);border-bottom:1px solid var(--line)}
+.spec div{padding:16px 16px 18px 0;display:flex;flex-direction:column;gap:4px;min-width:0}
+.spec div+div{padding-left:16px;border-left:1px solid var(--line)}
+.spec b{font-family:var(--display);font-size:34px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.spec small{color:var(--muted);font-size:13px}
+.note{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* section head */
+.sh{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.sh h2{font-size:clamp(34px,5vw,52px);font-weight:800;text-transform:uppercase}
+.sh p{color:var(--muted);max-width:52ch}
+
+/* filters */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{border:1px solid var(--line);background:transparent;padding:7px 14px;font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
+
+/* profiles */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.card header{padding:18px 20px 14px;display:flex;justify-content:space-between;gap:12px;align-items:start;border-bottom:1px solid var(--line)}
+.card h3{font-size:26px;font-weight:700;text-transform:uppercase}
+.ref{font-family:var(--mono);font-size:12px;color:var(--red);border:1px solid var(--red);padding:2px 7px;white-space:nowrap}
+.meta{padding:12px 20px;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+.meta b{color:var(--fg);font-weight:600}
+.fit{list-style:none;margin:0;padding:4px 20px 14px;display:flex;flex-direction:column;gap:7px}
+.fit li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:15px;align-items:baseline}
+.mk{font-family:var(--mono);font-weight:500;font-size:14px;text-align:center}
+.y{color:var(--ok)} .p{color:var(--part)} .n{color:var(--no)}
+.sn{margin:auto 20px 0;padding:12px 0 16px;border-top:1px dashed var(--line);font-size:14px;color:var(--muted)}
+.sn b{color:var(--fg);font-family:var(--display);letter-spacing:.05em;text-transform:uppercase;font-size:14px;margin-right:6px}
+.card footer{display:flex;border-top:1px solid var(--line)}
+.add{flex:1;background:transparent;border:0;padding:12px;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.add:hover{background:var(--red-soft)}
+.add[aria-pressed="true"]{background:var(--red);color:#fff}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:14px}
+
+/* proof */
+.proof{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pf{border:1px solid var(--line);background:var(--panel);padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.pf h3{font-size:30px;font-weight:800;text-transform:uppercase}
+.pf .where{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.pf p{color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:12px;padding:4px 8px;background:var(--panel2);border:1px solid var(--line)}
+.big{font-family:var(--display);font-size:56px;font-weight:800;line-height:.9;color:var(--red)}
+.big small{font-size:18px;color:var(--fg);font-weight:600;margin-left:8px;letter-spacing:.03em}
+.why{grid-column:1/-1;border-left:3px solid var(--red);padding:6px 0 6px 18px;font-size:18px;max-width:70ch}
+
+/* market */
+.mkt{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:15px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--panel2)}
+tr:last-child td{border-bottom:0}
+td.pay{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.nhl td{background:var(--red-soft)}
+tr.nhl td:first-child{font-weight:600}
+
+/* builder */
+.builder{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.roles{border:1px solid var(--line);background:var(--panel)}
+.role{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.role:last-child{border-bottom:0}
+.role .nm{font-family:var(--display);font-size:19px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.role .ds{font-size:13px;color:var(--muted)}
+.step{display:flex;align-items:center;border:1px solid var(--line)}
+.step button{width:34px;height:34px;background:transparent;border:0;font-size:18px;cursor:pointer}
+.step button:hover{background:var(--panel2)}
+.step output{width:32px;text-align:center;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.out{border:1px solid var(--line);background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.out label{font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+select{background:var(--panel2);color:var(--fg);border:1px solid var(--line);padding:9px 10px;font:inherit}
+.total{display:flex;align-items:baseline;gap:10px}
+.total b{font-family:var(--display);font-size:64px;font-weight:800;line-height:.9;color:var(--red);font-variant-numeric:tabular-nums}
+pre{white-space:pre-wrap;word-break:break-word;margin:0;font-family:var(--mono);font-size:13px;line-height:1.6;background:var(--panel2);border:1px solid var(--line);padding:14px;max-height:280px;overflow:auto}
+.cta{background:var(--red);color:#fff;border:0;padding:13px 18px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.cta:hover{filter:brightness(1.08)}
+.toast{font-size:13px;color:var(--ok);min-height:1.2em}
+
+/* contact */
+.contact{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;border-top:2px solid var(--fg);padding-top:26px}
+.contact h2{font-size:clamp(32px,5vw,48px);font-weight:800;text-transform:uppercase}
+.contact p{color:var(--muted);margin-top:12px;max-width:56ch}
+.det{display:flex;flex-direction:column;gap:10px;font-size:15px}
+.det div{display:grid;grid-template-columns:80px 1fr;gap:10px}
+.det span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.det b{font-weight:500;user-select:all;word-break:break-word}
+.src{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.src a{color:var(--muted)}
+
+@media (max-width:820px){
+  .hero,.builder,.proof,.contact{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .spec{grid-template-columns:1fr 1fr}
+  .spec div:nth-child(3){padding-left:0;border-left:0}
+  .spec div:nth-child(n+3){border-top:1px solid var(--line)}
+}
+@media (prefers-reduced-motion:no-preference){
+  .card{transition:opacity .2s}
+}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="mark">SYNTECH<b>.</b></div>
+    <div class="eyebrow">Prepared for Thomas Holmes · NHL, Dungannon · Oct 2026</div>
+  </div>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Re: several skilled welders, Dungannon</div>
+      <h1>NHL is hiring welders. <em>Here's who we'd send.</em></h1>
+      <p class="lede">I saw your post about adding several welders to the team. Rather than send a generic pitch, I've built this around your floor: <strong>bespoke cylinders, short runs, agri, construction and trailer customers.</strong> Filter the profiles, add the ones that fit, and send the request back. Shortlist within 72 hours.</p>
+      <div class="bead" aria-hidden="true"></div>
+    </div>
+    <div class="terms">
+      <div><span>Terms</span><strong>No placement, no fee</strong></div>
+      <div><span>Shortlist turnaround</span><strong>72 hours</strong></div>
+      <div><span>Coverage</span><strong>UK &amp; Ireland, NI included</strong></div>
+      <div><span>Roles</span><strong>Every role on the floor</strong></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="spec">
+      <div><b>90</b><small>skilled people on the team</small></div>
+      <div><b>400k+</b><small>cylinders built in three years</small></div>
+      <div><b>32–200<span style="font-size:18px">mm</span></b><small>bore range, stroke to 6,000mm</small></div>
+      <div><b>4</b><small>continents served</small></div>
+    </div>
+  </section>
+
+  <section id="profiles">
+    <div class="sh">
+      <h2>Blind profiles</h2>
+      <p>Anonymised. Graded against what your post asks for: quality work, pride in the job, production pace on bespoke cylinder fabrication.</p>
+    </div>
+    <div class="chips" role="group" aria-label="Filter profiles">
+      <button class="chip" data-f="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="mig" aria-pressed="false">MIG</button>
+      <button class="chip" data-f="tig" aria-pressed="false">TIG</button>
+      <button class="chip" data-f="robot" aria-pressed="false">Robotic</button>
+      <button class="chip" data-f="coded" aria-pressed="false">Coded</button>
+      <button class="chip" data-f="floor" aria-pressed="false">Beyond welding</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="legend"><span><b class="y mono">✓</b> meets</span><span><b class="p mono">~</b> partial</span><span><b class="n mono">✗</b> gap, stated plainly</span></div>
+  </section>
+
+  <section id="proof">
+    <div class="sh">
+      <h2>Already doing this</h2>
+      <p>Two live engagements. Both are welding and pipework-heavy, both need people who can hold a standard.</p>
+    </div>
+    <div class="proof">
+      <article class="pf">
+        <div class="where">Tarbert · Limerick · Dublin · Cavan</div>
+        <h3>Foynes Engineering</h3>
+        <div class="big">50+<small>roles · 6 disciplines</small></div>
+        <p>Full trades build-out across four Irish sites. We wrote each spec to the standard the work is inspected against, then qualified candidates against it.</p>
+        <div class="tags">
+          <span class="tag">Coded pipe welder · EN ISO 9606-1</span>
+          <span class="tag">Pipefitter · ASME B31.3</span>
+          <span class="tag">SS fabricator · EN 1090</span>
+          <span class="tag">Tank supervisor · API 650</span>
+          <span class="tag">Plater</span>
+          <span class="tag">Stick welder</span>
+        </div>
+      </article>
+      <article class="pf">
+        <div class="where">Ireland · UK · Germany</div>
+        <h3>Hayes Mechanical &amp; Engineering</h3>
+        <div class="big">3<small>countries</small></div>
+        <p>Mechanical contractor working across three countries. We're resourcing industrial pipefitters for a major project in the Frankfurt area, plus a subcontract package near Offenbach.</p>
+        <div class="tags">
+          <span class="tag">Industrial pipework</span>
+          <span class="tag">HDPE</span>
+          <span class="tag">Isometrics / P&amp;IDs</span>
+          <span class="tag">Pressure testing</span>
+        </div>
+      </article>
+      <p class="why">If we can staff coded welders across four Irish sites and pipefitters into Germany, a growing cylinder shop in Tyrone is home ground.</p>
+    </div>
+  </section>
+
+  <section id="market">
+    <div class="sh">
+      <h2>Who else wants your welders</h2>
+      <p>Twelve employers within reach of Dungannon advertising for welders right now. Your ad is competing with all of them for the same people.</p>
+    </div>
+    <div class="mkt">
+      <table>
+        <thead><tr><th>Employer</th><th>Role</th><th>Location</th></tr></thead>
+        <tbody>
+          <tr class="nhl"><td>NHL (you)</td><td>Skilled welders, several</td><td>Dungannon</td></tr>
+          <tr><td>Rubble Master</td><td>Fabricator welders</td><td>Dungannon</td></tr>
+          <tr><td>Terex</td><td>Welders</td><td>Dungannon</td></tr>
+          <tr><td>Specdrum</td><td>Welder / fabricator</td><td>Dungannon</td></tr>
+          <tr><td>Nugent Engineering</td><td>Welder</td><td>Dungannon</td></tr>
+          <tr><td>Cortex Engineering</td><td>Welder and fabricator</td><td>Dungannon</td></tr>
+          <tr><td>Muldoon Transport Systems</td><td>MIG aluminium fabricator / welder</td><td>Dungannon</td></tr>
+          <tr><td>Mercerpme</td><td>Stainless steel fabricator</td><td>Craigavon</td></tr>
+          <tr><td>Kane Group</td><td>TIG welder</td><td>Banbridge</td></tr>
+          <tr><td>Nugent Coachworks</td><td>Fabricators / welders</td><td>Magherafelt</td></tr>
+          <tr><td>Crossland Tankers</td><td>Apprentice fabricator</td><td>Maghera</td></tr>
+          <tr><td>SDC Trailers</td><td>Welders / fabricators</td><td>Toome</td></tr>
+          <tr><td>O'Hagan Steel Services</td><td>Welder / fabricator</td><td>Omagh</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Six of them are in Dungannon itself. We'd pitch NHL to candidates with the full package up front: early Friday finish, enhanced overtime, Westfield Health.</p>
+  </section>
+
+  <section id="request">
+    <div class="sh">
+      <h2>Build your shortlist</h2>
+      <p>Set headcount by role. Profiles you added above are included. Copy the request and send it to me.</p>
+    </div>
+    <div class="builder">
+      <div class="roles" id="roles"></div>
+      <div class="out">
+        <div class="total"><b id="tot">0</b><span class="eyebrow">people requested</span></div>
+        <label for="start">Start
+          <select id="start"><option>As soon as possible</option><option>Within 4 weeks</option><option>Within 8 weeks</option><option>Building a pipeline for 2027</option></select>
+        </label>
+        <label for="shift">Pattern
+          <select id="shift"><option>Days, early Friday finish</option><option>Days plus overtime</option><option>Shifts</option></select>
+        </label>
+        <pre id="msg" aria-live="polite"></pre>
+        <button class="cta" id="copy">Copy request</button>
+        <div class="toast" id="toast"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact">
+    <div>
+      <h2>Steve Brauner</h2>
+      <div class="eyebrow" style="margin-top:6px">Director, Syntech Recruitment</div>
+      <p>If you feel there is mileage in a further conversation, I would welcome that. No hard pitch, just an option to put on the table should you need reliable partners as you scale.</p>
+    </div>
+    <div class="det">
+      <div><span>Email</span><b>stephen@syntechrecruitment.co.uk</b></div>
+      <div><span>Mobile</span><b>+44 7598 577972</b></div>
+      <div><span>Office</span><b>01276 405 870</b></div>
+      <div><span>Web</span><b>syntechrecruitment.co.uk</b></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const P=[
+ {id:"WD-3107",t:"MIG Production Welder",tags:["mig"],yrs:"9 yrs",base:"Co. Tyrone",now:"Agricultural trailer manufacturer",avail:"4 weeks' notice",
+  fit:[["y","MIG on mild steel, all positions"],["y","Works from fabrication drawings unsupervised"],["y","Short-run and one-off work, not just line production"],["p","TIG on thin wall only, not to a ticket"],["n","No ISO 9606-1 coding"]],
+  note:"Wants a business that invests in kit. Your Friday finish matters to him."},
+ {id:"WD-3122",t:"MIG/TIG Welder Fabricator",tags:["mig","tig"],yrs:"12 yrs",base:"Co. Armagh",now:"Quarry and crushing equipment fabricator",avail:"Immediate",
+  fit:[["y","Heavy-section MIG, Hardox and wear plate"],["y","TIG on stainless and carbon"],["y","Sets out own jobs from GA drawings"],["p","ISO 9606-1 ticket lapsed in 2024, will re-test"],["n","No robotic cell experience"]],
+  note:"Strongest all-rounder. Re-test cost is the only friction."},
+ {id:"WD-3140",t:"Robotic Welding Technician",tags:["robot","mig"],yrs:"6 yrs",base:"Co. Tyrone",now:"Construction attachments manufacturer",avail:"1 month",
+  fit:[["y","Runs and teaches robotic MIG cells"],["y","Jig set-up and first-off inspection"],["y","Manual MIG to cover rework"],["p","Offline programming, basic level only"],["n","Limited bespoke manual fabrication"]],
+  note:"Useful if any cylinder families move to a cell."},
+ {id:"WD-3158",t:"Coded Welder",tags:["coded","tig","mig"],yrs:"15 yrs",base:"Moving to NI",now:"Process plant contractor (Foynes candidate pool)",avail:"3 weeks",
+  fit:[["y","ISO 9606-1 coded, 6G positional"],["y","TIG root, MIG/MMA fill and cap"],["y","Weld procedures and NDT records understood"],["p","Used to site work, not production pace"],["n","No direct cylinder or agri background"]],
+  note:"Overqualified for standard runs. Right person to lead quality on critical welds."},
+ {id:"MC-2211",t:"CNC Turner, Rod & Tube",tags:["floor"],yrs:"10 yrs",base:"Co. Tyrone",now:"Subcontract precision machinist",avail:"4 weeks' notice",
+  fit:[["y","CNC turning, Fanuc controls"],["y","Long-bar work, steady rest set-ups"],["y","Inspection to drawing tolerances"],["p","Some honing exposure, not daily"],["n","No milling programming"]],
+  note:"For when welding output outruns machining."},
+ {id:"HF-1904",t:"Hydraulic Assembler & Test",tags:["floor"],yrs:"7 yrs",base:"Co. Derry",now:"Plant hire workshop",avail:"2 weeks",
+  fit:[["y","Seal kits, cylinder strip and rebuild"],["y","Pressure testing and leak checks"],["y","Reads hydraulic schematics"],["p","Rebuild background, not new-build volume"],["n","No welding"]],
+  note:"Knows what a bad weld does to a cylinder in the field."}
+];
+const R=[
+ ["MIG welders","Production and bespoke, mild steel"],
+ ["MIG/TIG fabricators","Set out from drawings"],
+ ["Coded welders","ISO 9606-1 for critical welds"],
+ ["Robotic welding","Cell operators and programmers"],
+ ["CNC turners","Rod, tube and end fittings"],
+ ["Assembly & test","Seals, pressure test, QC"],
+ ["Supervisors","Weld shop team leads"]
+];
+const cnt=R.map((_,i)=>i===0?3:0), picked=new Set();
+const mk={y:"✓",p:"~",n:"✗"};
+const g=document.getElementById("grid");
+function render(f){
+ g.innerHTML="";
+ P.filter(p=>f==="all"||p.tags.includes(f)).forEach(p=>{
+  const c=document.createElement("article");c.className="card";
+  c.innerHTML=`<header><h3>${p.t}</h3><span class="ref">${p.id}</span></header>
+  <div class="meta"><span><b>${p.yrs}</b></span><span>${p.base}</span><span>${p.now}</span><span>${p.avail}</span></div>
+  <ul class="fit">${p.fit.map(([k,v])=>`<li><span class="mk ${k}" aria-label="${k==="y"?"meets":k==="p"?"partial":"gap"}">${mk[k]}</span><span>${v}</span></li>`).join("")}</ul>
+  <p class="sn"><b>Syntech note</b>${p.note}</p>
+  <footer><button class="add" data-id="${p.id}" aria-pressed="${picked.has(p.id)}">${picked.has(p.id)?"Added to shortlist":"Add to shortlist"}</button></footer>`;
+  g.appendChild(c);
+ });
+}
+document.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+ b.setAttribute("aria-pressed","true");render(b.dataset.f);
+}));
+g.addEventListener("click",e=>{
+ const b=e.target.closest(".add");if(!b)return;
+ const id=b.dataset.id;picked.has(id)?picked.delete(id):picked.add(id);
+ b.setAttribute("aria-pressed",picked.has(id));b.textContent=picked.has(id)?"Added to shortlist":"Add to shortlist";msg();
+});
+const rl=document.getElementById("roles");
+R.forEach(([n,d],i)=>{
+ const r=document.createElement("div");r.className="role";
+ r.innerHTML=`<div><div class="nm">${n}</div><div class="ds">${d}</div></div>
+ <div class="step"><button aria-label="Fewer ${n}" data-i="${i}" data-d="-1">−</button><output id="c${i}">${cnt[i]}</output><button aria-label="More ${n}" data-i="${i}" data-d="1">+</button></div>`;
+ rl.appendChild(r);
+});
+rl.addEventListener("click",e=>{
+ const b=e.target.closest("button[data-i]");if(!b)return;
+ const i=+b.dataset.i;cnt[i]=Math.max(0,Math.min(20,cnt[i]+(+b.dataset.d)));
+ document.getElementById("c"+i).textContent=cnt[i];msg();
+});
+["start","shift"].forEach(id=>document.getElementById(id).addEventListener("change",msg));
+function msg(){
+ const tot=cnt.reduce((a,b)=>a+b,0);document.getElementById("tot").textContent=tot;
+ const lines=R.map(([n],i)=>cnt[i]?`  ${cnt[i]} × ${n}`:null).filter(Boolean);
+ const pk=[...picked];
+ document.getElementById("msg").textContent=
+`Steve,
+
+NHL Dungannon would like a shortlist for:
+${lines.length?lines.join("\n"):"  (no roles set yet)"}
+
+Start: ${document.getElementById("start").value}
+Pattern: ${document.getElementById("shift").value}
+${pk.length?"\nProfiles we'd like to see: "+pk.join(", ")+"\n":""}
+Thomas Holmes
+NHL`;
+}
+document.getElementById("copy").addEventListener("click",()=>{
+ const t=document.getElementById("msg").textContent,ts=document.getElementById("toast");
+ const fallback=()=>{const r=document.createRange();r.selectNodeContents(document.getElementById("msg"));const s=getSelection();s.removeAllRanges();s.addRange(r);ts.textContent="Selected. Copy it and send to stephen@syntechrecruitment.co.uk";};
+ try{navigator.clipboard.writeText(t).then(()=>{ts.textContent="Copied. Paste into an email to stephen@syntechrecruitment.co.uk";}).catch(fallback);}catch(e){fallback();}
+});
+render("all");msg();
+</script>
